@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://miro.com/app/static/styles.1.0.css"/>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script>
+    function convert() {
+      const input = document.getElementById('input').value.trim()
+      const button = document.getElementById('render')
+      const exToPixels = 8
+
+      output = document.getElementById('output')
+      output.innerHTML = ''
+
+      MathJax.tex2svgPromise(input).then(node => {
+        const svgElement = node.getElementsByTagName('svg')[0]
+        const widthInPixels = svgElement.getAttribute('width').split('ex')[0] * exToPixels
+        const heightInPixels = svgElement.getAttribute('height').split('ex')[0] * exToPixels
+        const maxHeight = 250
+
+        svgElement.setAttribute("width", `${maxHeight * widthInPixels / heightInPixels}px`)
+        svgElement.setAttribute("height", `${maxHeight}px`)
+
+        const blob = new Blob([svgElement.outerHTML],{type:'image/svg+xml;charset=utf-8'})
+        const URL = window.URL || window.webkitURL || window
+        const blobURL = URL.createObjectURL(blob)
+
+        const image = new Image()
+        image.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+
+          const context = canvas.getContext('2d');
+          context.drawImage(image, 0, 0);
+        }
+        image.src = blobURL
+
+        output.appendChild(image);
+      }).catch(err => {
+        output.appendChild(document.createElement('pre')).appendChild(document.createTextNode(err.message));
+      })
+    }
+  </script>
+</head>
+<body style="padding: 4em">
+  <h1 class="miro-h1" style="margin-bottom: 0">LaTeX to PNG</h1>
+  <div>
+    <small>Copy/Paste the PNG on your board</small>
+  </div>
+  <br clear="all">
+  <div class="miro-input-group miro-input-group--medium">
+      <input id="input" type="text" class="miro-input miro-input--primary" placeholder="e^x">
+      <button class="miro-btn miro-btn--primary" onclick="convert()">Render</button>
+  </div>
+  <br clear="all">
+  <div id="output" style="overflow-x: scroll;"></div>
+</body>
+</html>

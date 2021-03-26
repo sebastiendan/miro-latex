@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://miro.com/app/static/sdk.1.1.js"></script>
+    <script>
+      miro.onReady(() => {
+        miro.initialize({
+          extensionPoints: {
+            bottomBar: {
+              title: 'LaTeX',
+              svgIcon: '<path d="M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z" stoke="#050038"/>',
+              onClick: () => {
+                miro.board.ui.openModal('form-view.html')
+              }
+            }
+          }
+        })
+      })
+    </script>
+</head>
+</html>
